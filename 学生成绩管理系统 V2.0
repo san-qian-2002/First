@@ -1,0 +1,231 @@
+#include<stdio.h>
+#include<string.h>
+/*
+200210422 Liang 100
+200210423 Du 0
+200210424 Paul 60
+200210425 David 70
+200210322 Harry 52
+200210114 Ronald 88
+200210235 Celine 92
+200210522 Eva 64
+200110516 Lily 71
+200111103 Jesse 94
+*/
+void PRINT(char *pna[],int score[],int num[],int n);
+void ReadScore(char *pna[],char name[][20],int score[],int num[],int n);
+float Average(int score[],int n);
+void Fun(char *pna[],int score[],int num[],int n,int (*f)(int a,int b));
+int LowScore(int a,int b);
+int HighScore(int a,int b);
+int Search(int a,int num[],int n);
+void NameStrcmp(char *pna[],int score[],int num[],int n);
+int NameSearch(char NAM[],char *pna[],int n);
+
+int main()
+{
+    printf("Number:200210422\n");
+    printf("Name:梁浩辉\n");
+    printf("Subject No.6\n");
+    printf("1. Input record\n");
+    printf("2. Calculate total and average score of course\n");
+    printf("3. Sort in descending order by score\n");
+    printf("4. Sort in ascending order by score\n");
+    printf("5. Sort in ascending order by student's ID\n");
+    printf("6. Sort in dictionary order by name\n7. Search by student's ID\n");
+    printf("7. Search by student's ID\n");
+    printf("8. Search by name\n");
+    printf("9. Statistic analysis\n");
+    printf("10.List record\n");
+    printf("11.Exit\nPlease enter your choice:");
+    int choice=0,n,score[30],num[30],ID,IF,a=0,b=0,c=0,d=0,e=0,i;
+    char name[30][20],*pna[30],NAM[20];
+    float aver;
+    while(choice!=11)
+    {
+        scanf("%d",&choice);
+        switch (choice)
+        {
+        case 1:
+            printf("How many students?\n");
+            scanf("%d",&n);
+            printf("Please input name, student's ID and score, format as 200210422 Liang 100\n");
+            ReadScore(pna,name,score,num,n);
+            printf("Success!\n");
+            break;
+        case 2:
+            aver=Average(score,n);
+            printf("Average score is %.2f\n",aver);
+            break;
+        case 3:
+            Fun(pna,score,num,n,HighScore);
+            PRINT(pna,score,num,n);
+            break;
+        case 4:
+            Fun(pna,score,num,n,LowScore);
+            PRINT(pna,score,num,n);
+            break;
+        case 5:
+            Fun(pna,num,score,n,LowScore);
+            PRINT(pna,score,num,n);
+            break;
+        case 6:
+            NameStrcmp(pna,score,num,n);
+            PRINT(pna,score,num,n);
+            break;
+        case 7:
+            Fun(pna,score,num,n,HighScore);
+            printf("ID:");
+            scanf("%d",&ID);
+            IF=Search(ID,num,n);
+            if(IF==-1)
+                printf("No Found.\n");
+            else
+                printf("Score:%d\nRanking:%d\n",score[IF],IF+1);
+            break;
+        case 8:
+            Fun(pna,score,num,n,HighScore);
+            printf("Name:");
+            getchar();
+            gets(NAM);
+            IF=NameSearch(NAM,pna,n);
+            if(IF==-1)
+                printf("No Found.\n");
+            else
+                printf("Score:%d\nRanking:%d\n",score[IF],IF+1);
+            break;
+        case 9:
+            for(i=0; i<n; i++)
+            {
+                if(score[i]>=90)
+                    a++;
+                if(score[i]>=80&&score[i]<90)
+                    b++;
+                if(score[i]>=70&&score[i]<80)
+                    c++;
+                if(score[i]>=60&&score[i]<70)
+                    d++;
+                if(score[i]<60)
+                    e++;
+            }
+            printf("优秀:%d人 %.0f%%\n",a,((float)a/n)*100);
+            printf("良好:%d人 %.0f%%\n",b,((float)b/n)*100);
+            printf("中等:%d人 %.0f%%\n",c,((float)c/n)*100);
+            printf("及格:%d人 %.0f%%\n",d,((float)d/n)*100);
+            printf("不及格:%d人 %.0f%%\n",e,((float)e/n)*100);
+            break;
+        case 10:
+            PRINT(pna,score,num,n);
+            break;
+        }
+    }
+    return 0;
+}
+
+void ReadScore(char *pna[],char name[][20],int score[],int num[],int n)
+{
+    int i;
+    for(i=0; i<n; i++)
+        {
+            scanf("%d %s %d",&num[i],name[i],&score[i]);
+            pna[i]=name[i];
+        }
+}
+
+float Average(int score[],int n)
+{
+    int i,sum;
+    for(i=0; i<n; i++)
+        sum+=score[i];
+    return (float)sum/n;
+}
+
+void Fun(char *pna[],int score[],int num[],int n,int (*f)(int a,int b))
+{
+    int i,j,k,temp;
+    char *tem=NULL;
+    for(i=0; i<n-1; i++)
+    {
+        k=i;
+        for(j=i+1; j<n; j++)
+        {
+            if((*f)(score[k],score[j]))
+                k=j;
+        }
+        if(k!=i)
+        {
+            temp=score[k];
+            score[k]=score[i];
+            score[i]=temp;
+            temp=num[k];
+            num[k]=num[i];
+            num[i]=temp;
+            tem=pna[k];
+            pna[k]=pna[i];
+            pna[i]=tem;
+        }
+    }
+}
+
+int HighScore(int a,int b)
+{
+    return a<b;
+}
+
+int LowScore(int a,int b)
+{
+    return a>b;
+}
+
+int Search(int a,int num[],int n)
+{
+    int i;
+    for(i=0; i<n; i++)
+    {
+        if(num[i]==a)
+            return i;
+    }
+    return -1;
+}
+
+void PRINT(char *pna[],int score[],int num[],int n)
+{
+    int i;
+    for(i=0; i<n; i++)
+        printf("%d %s %d\n",num[i],pna[i],score[i]);
+}
+
+void NameStrcmp(char *pna[],int score[],int num[],int n)
+{
+    int i,j,temp;
+    char *tem=NULL;
+    for(i=0; i<n-1; i++)
+    {
+        for(j=i+1; j<n; j++)
+        {
+            if(strcmp(pna[i],pna[j])>0)
+            {
+            temp=score[j];
+            score[j]=score[i];
+            score[i]=temp;
+            temp=num[j];
+            num[j]=num[i];
+            num[i]=temp;
+            tem=pna[j];
+            pna[j]=pna[i];
+            pna[i]=tem;
+            }
+        }
+    }
+}
+
+int NameSearch(char NAM[],char *pna[],int n)
+{
+    int i;
+    for(i=0; i<n; i++)
+    {
+        if(strcmp(pna[i],NAM)==0)
+            return i;
+    }
+    return -1;
+}
