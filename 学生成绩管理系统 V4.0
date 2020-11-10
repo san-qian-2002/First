@@ -1,0 +1,369 @@
+#include<stdio.h>
+#include<string.h>
+/*
+200210422 Liang 100 100 100
+200210423 Du 0 0.5 0
+200210424 Paul 60 70.5 75
+200210425 David 70.5 72 78
+200210322 Harry 52 80.5 73.5
+200210114 Ronald 88.5 92 70
+200210235 Celine 92 85.5 89
+200210522 Eva 64 46 60.5
+200110516 Lily 71.5 55 91.5
+200111103 Jesse 94 87 72.5
+*/
+
+typedef struct student//定义结构体
+{
+    long num;//学号
+    char name[20];//名字
+    float score[6];//单科成绩
+    float sum;//总分
+    float average;//平均分
+} STUDENT;
+
+int n,N;//定义人数和科目数
+
+int ReadScore(STUDENT *s)//读入学生信息
+{
+    int i,j;
+    for(i=0; i<n; i++)
+    {
+        scanf("%ld %s",&s[i].num,s[i].name);
+        for(j=0; j<N; j++)
+            scanf(" %f",&s[i].score[j]);
+        s[i].sum=0;
+        for(j=0; j<N; j++)
+            s[i].sum+=s[i].score[j];
+        s[i].average=s[i].sum/N;
+    }
+    return 1;
+}
+
+float SUM(STUDENT *s,int j)//计算单科总分
+{
+    int i;
+    float sum=0;
+    for(i=0; i<n; i++)
+        sum+=s[i].score[j];
+    return sum;
+}
+
+void Sort(STUDENT *s,int (*f)(int a,int b))//根据总分排序
+{
+    int i,j,k;
+    STUDENT temp;
+    for(i=0; i<n-1; i++)
+    {
+        k=i;
+        for(j=i+1; j<n; j++)
+        {
+            if((*f)(s[k].sum,s[j].sum))
+                k=j;
+        }
+        if(k!=i)//交换数据
+        {
+            temp=s[k];
+            s[k]=s[i];
+            s[i]=temp;
+        }
+    }
+}
+
+void SortNum(STUDENT *s,int (*f)(int a,int b))//根据学号排序
+{
+    int i,j,k;
+    STUDENT temp;
+    for(i=0; i<n-1; i++)
+    {
+        k=i;
+        for(j=i+1; j<n; j++)
+        {
+            if((*f)(s[k].num,s[j].num))
+                k=j;
+        }
+        if(k!=i)
+        {
+            temp=s[k];
+            s[k]=s[i];
+            s[i]=temp;
+        }
+    }
+}
+
+int HighScore(float a,float b)//降序排列
+{
+    return a<b;
+}
+
+int LowScore(float a,float b)//升序排列
+{
+    return a>b;
+}
+
+int NumSearch(long a,STUDENT *s)//名字搜索
+{
+    int i;
+    for(i=0; i<n; i++)
+    {
+        if(s[i].num==a)
+            return i;
+    }
+    return -1;//没有找到返回-1
+}
+
+void PRINT(STUDENT *s)//打印序号、学号、名字和单科成绩
+{
+    int i,j;
+    printf("No.        ID       Name");
+    for(i=0; i<N; i++)
+        printf("        Course%d",i+1);
+    printf("\n-----------------------------");
+    for(i=0; i<N; i++)
+        printf("--------------",i+1);
+    printf("\n");
+    for(i=0; i<n; i++)
+    {
+        if(i<9)
+            printf("%d   %ld %10s",i+1,s[i].num,s[i].name);
+        else
+            printf("%d  %ld %10s",i+1,s[i].num,s[i].name);
+        for(j=0; j<N; j++)
+            printf(" %14.2f",s[i].score[j]);
+        printf("\n");
+    }
+}
+
+void NameStrcmp(STUDENT *s)//按字典顺序排列
+{
+    int i,j,k;
+    STUDENT temp;
+    for(i=0; i<n-1; i++)
+    {
+        k=i;
+        for(j=i+1; j<n; j++)
+        {
+            if(strcmp(s[k].name,s[j].name)>0)
+                k=j;
+        }
+        if(k!=i)
+        {
+            temp=s[k];
+            s[k]=s[i];
+            s[i]=temp;
+        }
+    }
+}
+
+int NameSearch(char NAM[],STUDENT *s)//名字搜索
+{
+    int i;
+    for(i=0; i<n; i++)
+    {
+        if(strcmp(s[i].name,NAM)==0)
+            return i;
+    }
+    return -1;
+}
+
+void Analyse(STUDENT *s,int j)//成绩分析，输出分数段百分比
+{
+    int i,a=0,b=0,c=0,d=0,e=0;
+    for(i=0; i<n; i++)
+    {
+        if(s[i].score[j]>=90)
+            a++;
+        if(s[i].score[j]>=80&&s[i].score[j]<90)
+            b++;
+        if(s[i].score[j]>=70&&s[i].score[j]<80)
+            c++;
+        if(s[i].score[j]>=60&&s[i].score[j]<70)
+            d++;
+        if(s[i].score[j]<60)
+            e++;
+    }
+    printf("优秀:%d人 %.0f%%\n",a,((float)a/n)*100);
+    printf("良好:%d人 %.0f%%\n",b,((float)b/n)*100);
+    printf("中等:%d人 %.0f%%\n",c,((float)c/n)*100);
+    printf("及格:%d人 %.0f%%\n",d,((float)d/n)*100);
+    printf("不及格:%d人 %.0f%%\n",e,((float)e/n)*100);
+}
+
+int main()
+{
+    printf("Number:200210422\n");
+    printf("Name:梁浩辉\n");
+    printf("Subject No.8\n");
+    printf("1. Input record\n");
+    printf("2. Calculate average score of course\n");
+    printf("3. Calculate total and average score of every student\n");
+    printf("4. Sort in descending order by total score of every student\n");
+    printf("5. Sort in ascending order by total score of every student\n");
+    printf("6. Sort in ascending order by student's ID\n");
+    printf("7. Sort in dictionary order by name\n7. Search by student's ID\n");
+    printf("8. Search by student's ID\n");
+    printf("9. Search by name\n");
+    printf("10.Statistic analysis for every course\n");
+    printf("11.List record\n");
+    printf("12.Exit\nPlease enter your choice:");
+    int choice=0,IF,i,j,R=0;//定义选择变量，判断是否搜索成功的变量，两个遍历变量，判断是否已经录入的变量
+    long ID;//定义学号搜索值
+    char NAM[30];//定义名字搜索值
+    STUDENT stu[30];
+    while(choice!=12)//12时退出
+    {
+
+        scanf("%d",&choice);
+        while(choice<=0||choice>12)//错误输入
+        {
+            printf("Please choose again.\n");
+            scanf("%d",&choice);
+        }
+        switch (choice)
+        {
+        case 1://录入
+            printf("How many students?(<=30)\n");
+            scanf("%d",&n);
+            while(!(n>=1&&n<=30))//超出范围数据
+            {
+                printf("Wrong input! Please try again.\n");
+                scanf("%d",&n);
+            }
+            printf("How many courses?(<=6)\n");
+            scanf("%d",&N);
+            while(!(N>=1&&N<=6))//超出范围数据
+            {
+                printf("Wrong input! Please try again.\n");
+                scanf("%d",&N);
+            }
+            printf("Please input name, student's ID and score, format as 200210422 Liang 100 100 100\n");
+            R=ReadScore(stu);//成功录入
+            printf("Success!\n");
+            break;
+        case 2://计算每门课程的总分和平均分
+            if(R==0)//判断是否已录入
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            for(j=0; j<N; j++)
+            {
+                float sum=SUM(stu,j);
+                float aver=sum/n;
+                printf("Total score of course%d is %.2f  ",j+1,sum);
+                printf("Average score of course%d is %.2f\n",j+1,aver);
+            }
+            break;
+        case 3://)计算每个学生的总分和平均分
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            printf("       ID       Name    Total Score  Average Score\n");
+            printf("--------------------------------------------------\n");
+            for(i=0; i<n; i++)
+                printf("%ld %10s %14.2f %14.2f\n",stu[i].num,stu[i].name,stu[i].sum,stu[i].average);
+            break;
+        case 4://按每个学生的总分由高到低排出名次表
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            Sort(stu,HighScore);
+            PRINT(stu);
+            break;
+        case 5://按每个学生的总分由高到低排出名次表
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            Sort(stu,LowScore);
+            PRINT(stu);
+            break;
+        case 6://)按学号由小到大排出成绩表
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            SortNum(stu,LowScore);
+            PRINT(stu);
+            break;
+        case 7://按姓名的字典顺序排出成绩表
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            NameStrcmp(stu);
+            PRINT(stu);
+            break;
+        case 8://按学号查询学生排名及其各科考试成绩
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            Sort(stu,HighScore);
+            printf("ID:");
+            scanf("%d",&ID);
+            IF=NumSearch(ID,stu);
+            if(IF==-1)
+                printf("No Found.\n");//无匹配
+            else
+            {
+                printf("Name:%s\n",stu[IF].name);
+                for(j=0; j<N; j++)
+                    printf("Course%d:%.2f\n",j+1,stu[IF].score[j]);
+                printf("Ranking:%d\n",IF+1);
+            }
+            break;
+        case 9://按姓名查询学生排名及其各科考试成绩
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            Sort(stu,HighScore);
+            printf("Name:");
+            getchar();
+            gets(NAM);
+            IF=NameSearch(NAM,stu);
+            if(IF==-1)
+                printf("No Found.\n");
+            else
+            {
+                printf("ID:%ld\n",stu[IF].num);
+                for(j=0; j<N; j++)
+                    printf("Course%d:%.2f\n",j+1,stu[IF].score[j]);
+                printf("Ranking:%d\n",IF+1);
+            }
+            break;
+        case 10://按优秀（90-100分）、良好（80-89分）、中等（70-79分）、及格（60 -69分）、不及格(0-59分)5个类别，对每门课程分别统计每个类别的人数以及所占的百分比
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            for(j=0; j<N; j++)
+            {
+                printf("Course%d:\n",j+1);
+                Analyse(stu,j);
+            }
+            break;
+        case 11://输出每个学生的学号、姓名、各科考试成绩、总分和平均分
+            if(R==0)
+            {
+                printf("Please input record first.\n");
+                break;
+            }
+            PRINT(stu);
+            break;
+        }
+    }
+    return 0;
+}
+
